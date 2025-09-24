@@ -236,7 +236,8 @@ update_geodata() {
     log_info "开始更新 GeoIP 和 GeoSite 数据"
     
     # 使用官方脚本更新
-    if bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install-geodata; then
+    if bash -c "$(curl -L https://raw.githubusercontent.com/5548269/my-script/main/install-release.sh
+)" @ install-geodata; then
         echo
         echo -e "$green 数据库更新成功! $none"
         log_info "数据库更新成功 (官方脚本)"
@@ -2461,7 +2462,8 @@ uninstall_xray() {
     echo -e "$yellow 正在卸载 Xray... $none"
     
     # 使用官方脚本卸载
-    if bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ remove --purge; then
+    if bash -c "$(curl -L https://raw.githubusercontent.com/5548269/my-script/main/install-release.sh
+)" @ remove --purge; then
         echo -e "$green Xray 卸载成功! $none"
     else
         echo -e "$red Xray 卸载失败! 请检查错误信息 $none"
@@ -3094,7 +3096,8 @@ install_xray() {
     echo
     echo -e "${yellow}Xray官方脚本安装最新版本$none"
     echo "----------------------------------------------------------------"
-    bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
+    bash -c "$(curl -L https://raw.githubusercontent.com/5548269/my-script/main/install-release.sh
+)" @ install
     
     # 检查安装结果
     if ! command -v xray &> /dev/null; then
