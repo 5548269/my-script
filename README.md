@@ -27,7 +27,8 @@
 请在您的服务器上以 root 权限运行以下命令：
 
 ```bash
-bash <(curl -L https://raw.githubusercontent.com/5548269/my-script/main/install.sh)```
+bash <(curl -L https://raw.githubusercontent.com/5548269/my-script/main/install.sh)
+```
 
 脚本会自动检测并安装所需的依赖（如 `jq`, `curl`, `haproxy` 等），然后进入主管理菜单。
 
