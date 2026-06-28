@@ -1229,11 +1229,7 @@ generate_connection_info() {
     echo -e "${cyan}${vless_reality_url}${none}"
     echo
     
-    # 生成二维码
-    echo "二维码:"
-    qrencode -t UTF8 "$vless_reality_url"
-    qrencode -t ANSI "$vless_reality_url"
-    
+      
     # 生成SOCKS5链接（如果配置了HAProxy）
     if [[ -n "$port_info" ]]; then
         local haproxy_enabled=$(echo "$port_info" | jq -r '.haproxy.enabled // false')
@@ -1260,11 +1256,7 @@ generate_connection_info() {
                 echo -e "${cyan}${socks5_url}${none}"
             fi
             
-            # 为SOCKS5链接生成二维码
-            echo
-            echo "SOCKS5 二维码:"
-            qrencode -t UTF8 "$socks5_url"
-            qrencode -t ANSI "$socks5_url"
+     
         fi
     fi
     
@@ -1400,18 +1392,22 @@ configure_socks5_for_port() {
         break
     done
     
-    # 是否需要认证
-    echo -e "是否需要用户名密码认证?"
-    read -p "$(echo -e "(y/n, 默认: ${cyan}n${none}): ")" auth_needed
-    [ -z "$auth_needed" ] && auth_needed="n"
-    
-    socks5_user=""
-    socks5_pass=""
-    if [[ $auth_needed = "y" ]]; then
-        read -p "$(echo -e "请输入用户名: ")" socks5_user
-        read -p "$(echo -e "请输入密码: ")" socks5_pass
-        echo  # 为了换行
-    fi
+# 是否需要认证
+echo -e "是否需要用户名密码认证?"
+read -p "$(echo -e "(y/n, 默认: ${cyan}y${none}): ")" auth_needed
+[ -z "$auth_needed" ] && auth_needed="y"
+
+socks5_user=""
+socks5_pass=""
+if [[ $auth_needed = "y" ]]; then
+    read -p "$(echo -e "请输入用户名 (默认: ${cyan}izdvrqng${none}): ")" socks5_user
+    [ -z "$socks5_user" ] && socks5_user="izdvrqng"
+
+    read -p "$(echo -e "请输入密码 (默认: ${cyan}x9oxua2q3006${none}): ")" socks5_pass
+    [ -z "$socks5_pass" ] && socks5_pass="x9oxua2q3006"
+
+    echo  # 为了换行
+fi
     
     # 是否启用 UDP over TCP
     echo -e "是否启用 UDP over TCP?"
