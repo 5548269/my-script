@@ -1015,14 +1015,15 @@ key_pair_output=$(xray x25519)
 
 # 从输出中提取默认的私钥和公钥
 local default_private_key
-default_private_key=$(echo "$key_pair_output" | grep 'PrivateKey:' | awk '{print $2}')
+default_private_key=$(echo "$key_pair_output" | awk -F':[[:space:]]*' 'tolower($1) ~ /^private[[:space:]]*key$/ {print $2; exit}')
 local default_public_key
-default_public_key=$(echo "$key_pair_output" | grep 'PublicKey:' | awk '{print $2}')
+default_public_key=$(echo "$key_pair_output" | awk -F':[[:space:]]*' 'tolower($1) ~ /^public[[:space:]]*key$/ {print $2; exit}')
 
 # 检查密钥是否成功生成
 if [[ -z "$default_private_key" || -z "$default_public_key" ]]; then
-    echo -e "${red}错误: 自动生成密钥失败! 请检查xray命令是否能正常工作。${none}"
-    log_error "自动生成密钥失败"
+    echo -e "${red}错误: 自动生成密钥失败! xray x25519 输出如下:${none}"
+    echo "$key_pair_output"
+    log_error "自动生成密钥失败: $key_pair_output"
     return 1
 fi
 
@@ -1037,7 +1038,7 @@ if [[ -z "$private_key" ]]; then
 else
     # 用户输入了自定义私钥，我们需要为其计算公钥
     echo -e "${yellow}正在为您输入的私钥计算对应的公钥...${none}"
-    public_key=$(xray x25519 -i "$private_key" | grep 'PublicKey:' | awk '{print $2}')
+    public_key=$(xray x25519 -i "$private_key" 2>&1 | awk -F':[[:space:]]*' 'tolower($1) ~ /^public[[:space:]]*key$/ {print $2; exit}')
     if [[ -z "$public_key" ]]; then
        echo -e "${red}无法从您输入的私钥派生出公钥，请检查私钥是否正确。${none}"
        log_error "无法从用户输入的私钥派生公钥"
@@ -1806,9 +1807,9 @@ modify_port_uuid() {
         
         # 生成新的密钥
         local seed=$(echo -n ${new_uuid} | md5sum | head -c 32 | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-        local tmp_key=$(echo -n ${seed} | xargs xray x25519 -i)
-        local new_private_key=$(echo ${tmp_key} | awk '{print $3}')
-        local new_public_key=$(echo ${tmp_key} | awk '{print $6}')
+        local tmp_key=$(echo -n ${seed} | xargs xray x25519 -i 2>&1)
+        local new_private_key=$(echo "$tmp_key" | awk -F':[[:space:]]*' 'tolower($1) ~ /^private[[:space:]]*key$/ {print $2; exit}')
+        local new_public_key=$(echo "$tmp_key" | awk -F':[[:space:]]*' 'tolower($1) ~ /^public[[:space:]]*key$/ {print $2; exit}')
 
         # 获取旧密钥对
         local old_private_key=$(echo "$port_info" | jq -r '.private_key')
